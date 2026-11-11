@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>라오스 골프 라운지</title>
+<meta name="description" content="모르는 골퍼들과 잠시 머물다 가는 라오스 비엔티안 골프 라운지">
+<meta property="og:title" content="라오스 골프 라운지">
+<meta property="og:description" content="페어웨이 산책, 라운드 후 라운지, 메콩강 노을까지. 잠시 머물다 가세요.">
+<meta property="og:image" content="assets/hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--dk:#0f2d24;--dk2:#1d4337;--iv:#f7f6ee;--ye:#f6c945;--or:#e9572f;--tx:#2f4440;--mut:#6f8279}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--dk);font-family:'Noto Sans KR',system-ui,sans-serif;color:var(--iv);letter-spacing:-.02em;word-break:keep-all}
+button{font:inherit;cursor:pointer;border:0}
+input{font:inherit}
+
+/* ---------- HUD ---------- */
+#hud{position:fixed;left:0;right:0;top:0;height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;z-index:20;background:linear-gradient(180deg,rgba(15,45,36,.96),rgba(15,45,36,.82));backdrop-filter:blur(6px)}
+#hud h1{font-size:16px;font-weight:900;white-space:nowrap}
+#hud h1 span{color:var(--ye)}
+.chip{font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--dk2);color:#cfe1d8;white-space:nowrap}
+#count b{color:var(--ye)}
+#hud .sp{flex:1}
+#soundBtn{background:var(--dk2);color:var(--iv);border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+#modeChip.solo{background:#3d3a22;color:#f3dc8a}
+@media(max-width:560px){#hud{gap:6px;padding:0 10px}#hud h1{font-size:14px}#clock{display:none}#modeChip{font-size:11px;padding:4px 8px}#soundBtn{padding:5px 9px}}
+
+/* ---------- Stage / World ---------- */
+#stage{position:fixed;left:0;right:0;top:52px;bottom:64px;overflow:hidden}
+#world{position:absolute;left:0;top:0;width:900px;height:1200px;transform-origin:0 0;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);background:#9ccf7f;cursor:pointer;user-select:none}
+.z{position:absolute;border-radius:28px}
+.lbl{position:absolute;font-size:15px;font-weight:900;color:var(--dk);background:rgba(247,246,238,.92);padding:5px 13px;border-radius:20px;box-shadow:0 3px 10px rgba(0,0,0,.12);white-space:nowrap;pointer-events:none}
+.lbl small{font-weight:700;color:var(--mut);margin-left:5px}
+.sign{position:absolute;width:44px;height:44px;border-radius:50%;background:var(--ye);color:var(--dk);font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.25);animation:bob 2.6s ease-in-out infinite;z-index:3}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.tree{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 30%,#5fa564,#2f6e40 70%);box-shadow:0 8px 0 rgba(0,0,0,.08)}
+.palm{position:absolute;width:10px;background:#8a6a45;border-radius:4px}
+.palm:after{content:"";position:absolute;left:-26px;top:-18px;width:62px;height:34px;border-radius:50%;background:radial-gradient(ellipse at 50% 60%,#4f9a55,#2b6a3b 70%)}
+.path{position:absolute;background:#e8d9b0;border-radius:30px;opacity:.9}
+
+/* fairway */
+#fair{left:30px;top:300px;width:410px;height:410px;background:repeating-linear-gradient(135deg,#7cc56a 0 34px,#71ba60 34px 68px)}
+.green{position:absolute;left:250px;top:70px;width:120px;height:90px;border-radius:50%;background:#9be08a;box-shadow:inset 0 0 0 6px #86d176}
+.pin{position:absolute;left:306px;top:52px;width:3px;height:52px;background:#fff}
+.pin:after{content:"";position:absolute;left:3px;top:0;border-left:22px solid var(--or);border-top:8px solid transparent;border-bottom:8px solid transparent}
+.bunker{position:absolute;left:120px;top:220px;width:130px;height:70px;border-radius:60% 40% 55% 45%;background:#efe1b4;box-shadow:inset 0 -6px 0 #e2d09b}
+.tee{position:absolute;left:40px;top:330px;width:80px;height:40px;border-radius:10px;background:#8fd47c}
+
+/* clubhouse */
+#club{left:240px;top:30px;width:420px;height:240px;background:#a9d98e}
+.house{position:absolute;left:90px;top:70px;width:240px;height:110px;background:#f3ead4;border-radius:6px;box-shadow:0 10px 0 rgba(0,0,0,.1)}
+.roof{position:absolute;left:70px;top:22px;width:280px;height:60px;background:var(--dk);clip-path:polygon(8% 100%,50% 0,92% 100%)}
+.win{position:absolute;top:30px;width:36px;height:30px;background:#ffe39a;border-radius:4px;box-shadow:0 0 0 3px #d6c49a}
+.door{position:absolute;left:102px;top:52px;width:36px;height:58px;background:#7b5a3a;border-radius:4px 4px 0 0}
+
+/* lounge */
+#lounge{left:470px;top:300px;width:400px;height:410px;background:repeating-linear-gradient(90deg,#c69c6d 0 26px,#b98e5f 26px 28px)}
+.pool{position:absolute;left:70px;top:80px;width:250px;height:150px;border-radius:50%;background:radial-gradient(ellipse at 40% 35%,#9fe7e2,#3fb3b0 70%);box-shadow:0 0 0 10px #e9dcc0}
+.steam{position:absolute;width:14px;height:44px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.75));filter:blur(3px);animation:steam 3.4s ease-in-out infinite}
+@keyframes steam{0%{transform:translateY(10px) scaleX(1);opacity:0}40%{opacity:.85}100%{transform:translateY(-36px) scaleX(1.8);opacity:0}}
+.lounger{position:absolute;width:44px;height:96px;border-radius:12px;background:#f7f6ee;box-shadow:inset 0 -26px 0 #e9572f33,0 6px 0 rgba(0,0,0,.08)}
+.lantern{position:absolute;width:16px;height:16px;border-radius:50%;background:#ffd36b;box-shadow:0 0 18px 6px rgba(255,200,90,.0);transition:box-shadow 2s}
+
+/* riverside */
+#river-bank{left:0;top:740px;width:900px;height:290px;border-radius:0;background:linear-gradient(180deg,#8fc674,#7db866)}
+#river{position:absolute;left:0;top:1020px;width:900px;height:130px;background:linear-gradient(180deg,#5aa3c2,#3d86a6);overflow:hidden}
+#river:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(170deg,rgba(255,255,255,.0) 0 40px,rgba(255,255,255,.18) 40px 44px);animation:flow 9s linear infinite}
+@keyframes flow{to{background-position:300px 0}}
+#farbank{position:absolute;left:0;top:1150px;width:900px;height:50px;background:#3f5a4a}
+.flight{position:absolute;top:1160px;width:4px;height:4px;border-radius:50%;background:#ffd36b;opacity:0;transition:opacity 2s}
+.stall{position:absolute;top:800px;width:70px;height:48px}
+.stall i{position:absolute;left:0;top:0;width:70px;height:22px;clip-path:polygon(0 100%,10% 0,90% 0,100% 100%)}
+.stall b{position:absolute;left:6px;top:22px;width:58px;height:26px;background:#f3ead4;border-radius:0 0 4px 4px}
+.bench{position:absolute;width:80px;height:16px;border-radius:6px;background:#8a6a45;box-shadow:0 6px 0 rgba(0,0,0,.1)}
+.lamp{position:absolute;width:6px;height:40px;background:#3b4a42;border-radius:3px}
+.lamp:after{content:"";position:absolute;left:-7px;top:-12px;width:20px;height:20px;border-radius:50%;background:#ffe39a;box-shadow:0 0 0 rgba(255,210,110,0);transition:box-shadow 2s}
+.night .lamp:after{box-shadow:0 0 34px 14px rgba(255,210,110,.55)}
+.night .lantern{box-shadow:0 0 22px 8px rgba(255,200,90,.6)}
+.night .flight{opacity:1}
+#tint{position:absolute;inset:0;pointer-events:none;transition:background 3s;z-index:6}
+
+/* people */
+#people{position:absolute;inset:0;z-index:5}
+.p{position:absolute;left:0;top:0;width:0;height:0;will-change:transform}
+.p .av{position:absolute;left:-19px;top:-46px;width:38px;height:38px;border-radius:50%;border:3px solid #fff;box-shadow:0 6px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:18px}
+.p .sh{position:absolute;left:-14px;top:-6px;width:28px;height:8px;border-radius:50%;background:rgba(0,0,0,.18)}
+.p .nm{position:absolute;left:50%;top:-4px;transform:translateX(-50%);font-size:12px;font-weight:900;color:var(--dk);background:rgba(247,246,238,.95);padding:1px 8px;border-radius:10px;white-space:nowrap}
+.p .nm em{font-style:normal;color:var(--or);margin-left:3px}
+.p.me .av{border-color:var(--ye);box-shadow:0 0 0 4px rgba(246,201,69,.45),0 6px 10px rgba(0,0,0,.25)}
+.p .bub{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);max-width:200px;width:max-content;background:#fff;color:var(--dk);font-size:13px;font-weight:700;line-height:1.35;padding:7px 11px;border-radius:14px;box-shadow:0 6px 14px rgba(0,0,0,.18);opacity:0;transition:opacity .3s;pointer-events:none}
+.p .bub.big{font-size:28px;padding:4px 10px}
+.p .bub.on{opacity:1}
+.p .st{position:absolute;left:12px;top:-56px;font-size:16px}
+.p.walk .av{animation:step .36s ease-in-out infinite}
+@keyframes step{50%{transform:translateY(-3px)}}
+.tap{position:absolute;width:30px;height:12px;border-radius:50%;border:2px solid #fff;transform:translate(-50%,-50%);animation:tap .7s ease-out forwards;pointer-events:none;z-index:4}
+@keyframes tap{from{opacity:1;width:10px;height:4px}to{opacity:0;width:44px;height:18px}}
+
+/* ---------- Chat bar ---------- */
+#bar{position:fixed;left:0;right:0;bottom:0;height:64px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center;background:var(--dk);z-index:20;border-top:1px solid rgba(255,255,255,.06)}
+#emo{display:flex;gap:4px}
+#emo button{width:40px;height:40px;border-radius:50%;background:var(--dk2);font-size:19px}
+#say{flex:1;min-width:0;height:42px;border-radius:22px;border:0;padding:0 16px;background:var(--iv);color:var(--dk);font-size:14px}
+#sendBtn{height:42px;padding:0 16px;border-radius:22px;background:var(--ye);color:var(--dk);font-weight:900}
+@media(max-width:560px){#emo button:nth-child(n+4){display:none}}
+#log{position:fixed;left:12px;top:62px;z-index:15;display:flex;flex-direction:column;gap:4px;pointer-events:none;max-width:min(320px,70vw)}
+#log div{font-size:12px;background:rgba(15,45,36,.78);padding:4px 10px;border-radius:12px;color:#dfe9e3;animation:fadeLog 12s forwards}
+#log div b{color:var(--ye);margin-right:5px}
+@keyframes fadeLog{0%{opacity:0}5%{opacity:1}80%{opacity:1}100%{opacity:0}}
+
+/* ---------- Zone panel ---------- */
+#peek{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:18;background:var(--ye);color:var(--dk);font-weight:900;font-size:14px;padding:10px 18px;border-radius:24px;box-shadow:0 8px 24px rgba(0,0,0,.3);display:none;white-space:nowrap}
+#sheet{position:fixed;left:0;right:0;bottom:0;max-height:78vh;z-index:30;background:var(--iv);color:var(--dk);border-radius:22px 22px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.35);transform:translateY(105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;max-width:760px;margin:0 auto}
+#sheet.on{transform:none}
+#sheet header{padding:16px 20px 8px;display:flex;align-items:flex-start;gap:10px}
+#sheet header div{flex:1}
+#sheet .ey{font-size:12px;font-weight:900;color:var(--or);letter-spacing:.06em}
+#sheet h2{font-size:22px;font-weight:900;margin-top:2px;line-height:1.3}
+#closeSheet{width:36px;height:36px;border-radius:50%;background:#e6e3d6;color:var(--dk);font-size:18px;font-weight:900;flex:none}
+#sheetBody{overflow:auto;padding:4px 20px 22px}
+.ph{display:flex;gap:10px;overflow-x:auto;padding:6px 0 10px;scroll-snap-type:x mandatory}
+.ph figure{flex:none;width:240px;scroll-snap-align:start}
+.ph img{width:240px;height:160px;object-fit:cover;border-radius:14px;display:block;background:#ddd}
+.ph figcaption{font-size:12px;font-weight:700;color:var(--mut);margin-top:5px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:6px}
+.card{background:#fff;border:1px solid #e3e2d8;border-radius:14px;padding:12px 14px}
+.card b{display:block;font-size:15px;font-weight:900}
+.card span{display:block;font-size:12px;font-weight:700;color:#1b7a4c;margin-top:2px}
+.card p{font-size:13px;color:var(--tx);line-height:1.5;margin-top:5px}
+.note{font-size:12px;color:var(--mut);margin-top:10px;line-height:1.6}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:42px;padding:0 18px;border-radius:22px;font-weight:900;font-size:14px;text-decoration:none}
+.btn.y{background:var(--ye);color:var(--dk)}
+.btn.d{background:var(--dk);color:var(--iv)}
+.btn.l{background:#e6e3d6;color:var(--dk)}
+.tabs{display:flex;gap:6px;margin:6px 0 10px}
+.tabs button{flex:1;height:38px;border-radius:12px;background:#e6e3d6;color:var(--dk);font-weight:900}
+.tabs button.on{background:var(--dk);color:var(--ye)}
+.reco{background:var(--dk);color:var(--iv);border-radius:16px;padding:16px 18px}
+.reco h3{font-size:19px;font-weight:900;color:var(--ye)}
+.reco p{font-size:14px;line-height:1.6;margin-top:6px;color:#dfe9e3}
+.reco ul{margin:8px 0 0 18px;font-size:13.5px;line-height:1.7;color:#dfe9e3}
+
+/* ---------- Entrance ---------- */
+#gate{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(10,30,24,.55)}
+#gate:before{content:"";position:fixed;inset:0;background:url(assets/hero.jpg) center/cover;filter:blur(6px) brightness(.55);transform:scale(1.06);z-index:-1}
+.gbox{width:100%;max-width:440px;background:var(--iv);color:var(--dk);border-radius:22px;padding:26px 24px 22px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.gbox .ey{font-size:12px;font-weight:900;color:var(--or);letter-spacing:.12em}
+.gbox h2{font-size:28px;font-weight:900;line-height:1.25;margin-top:4px}
+.gbox .sub{font-size:14px;color:var(--tx);margin-top:6px;line-height:1.55}
+.gbox label{display:block;font-size:13px;font-weight:900;margin-top:18px}
+.gbox input{width:100%;height:46px;border:2px solid #dcd8c8;border-radius:12px;padding:0 14px;margin-top:6px;font-size:15px;background:#fff;color:var(--dk)}
+.gbox input:focus{outline:none;border-color:var(--dk)}
+.party{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.party button{height:52px;border-radius:12px;background:#fff;border:2px solid #dcd8c8;color:var(--dk);font-weight:900;font-size:16px}
+.party button.on{background:var(--dk);border-color:var(--dk);color:var(--ye)}
+#gReco{font-size:13px;color:#1b7a4c;font-weight:700;margin-top:8px;min-height:20px;line-height:1.5}
+#enter{width:100%;height:52px;border-radius:14px;background:var(--dk);color:var(--ye);font-weight:900;font-size:17px;margin-top:16px}
+#enter:disabled{opacity:.4;cursor:default}
+.gbox .fine{font-size:11.5px;color:var(--mut);margin-top:10px;text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <h1>라오스 골프 <span>라운지</span></h1>
+  <span class="chip" id="count">혼자 둘러보는 중</span>
+  <span class="chip" id="clock">라오스 --:--</span>
+  <span class="sp"></span>
+  <span class="chip" id="modeChip"></span>
+  <button id="soundBtn">🔇 소리</button>
+</div>
+
+<div id="stage"><div id="world">
+  <!-- paths -->
+  <div class="path" style="left:430px;top:260px;width:40px;height:500px"></div>
+  <div class="path" style="left:200px;top:700px;width:30px;height:60px"></div>
+  <div class="path" style="left:660px;top:700px;width:30px;height:60px"></div>
+  <div class="path" style="left:60px;top:930px;width:780px;height:26px"></div>
+
+  <!-- clubhouse -->
+  <div class="z" id="club">
+    <div class="roof"></div>
+    <div class="house"><div class="win" style="left:24px"></div><div class="win" style="left:180px"></div><div class="door"></div></div>
+  </div>
+  <div class="lbl" style="left:390px;top:12px">🏡 클럽하우스<small>입구 · 일행 맞춤 안내</small></div>
+  <div class="sign" style="left:600px;top:190px" data-zone="club">📋</div>
+
+  <!-- fairway -->
+  <div class="z" id="fair"><div class="green"></div><div class="pin"></div><div class="bunker"></div><div class="tee"></div></div>
+  <div class="lbl" style="left:60px;top:286px">⛳ 아침 페어웨이<small>코스 구경</small></div>
+  <div class="sign" style="left:370px;top:640px" data-zone="fair">⛳</div>
+  <div class="tree" style="left:44px;top:420px;width:60px;height:60px"></div>
+  <div class="tree" style="left:350px;top:330px;width:46px;height:46px"></div>
+  <div class="tree" style="left:300px;top:560px;width:56px;height:56px"></div>
+  <div class="tree" style="left:90px;top:610px;width:40px;height:40px"></div>
+
+  <!-- lounge -->
+  <div class="z" id="lounge">
+    <div class="pool"></div>
+    <div class="steam" style="left:150px;top:110px"></div><div class="steam" style="left:200px;top:100px;animation-delay:1.1s"></div><div class="steam" style="left:250px;top:120px;animation-delay:2.2s"></div>
+    <div class="lounger" style="left:40px;top:270px"></div><div class="lounger" style="left:110px;top:270px"></div><div class="lounger" style="left:180px;top:270px"></div><div class="lounger" style="left:250px;top:270px"></div>
+    <div class="lantern" style="left:20px;top:20px"></div><div class="lantern" style="left:360px;top:20px"></div><div class="lantern" style="left:360px;top:370px"></div>
+  </div>
+  <div class="lbl" style="left:500px;top:286px">♨️ 라운드 후 라운지<small>쉬어 가기</small></div>
+  <div class="sign" style="left:800px;top:640px" data-zone="lounge">♨️</div>
+
+  <!-- riverside -->
+  <div class="z" id="river-bank"></div>
+  <div class="lbl" style="left:30px;top:760px">🌅 메콩강변<small>노을 · 야시장</small></div>
+  <div class="sign" style="left:820px;top:880px" data-zone="river">🌅</div>
+  <div class="stall" style="left:330px"><i style="background:#e9572f"></i><b></b></div>
+  <div class="stall" style="left:420px"><i style="background:#f6c945"></i><b></b></div>
+  <div class="stall" style="left:510px"><i style="background:#3fb3b0"></i><b></b></div>
+  <div class="stall" style="left:600px"><i style="background:#e9572f"></i><b></b></div>
+  <div class="bench" style="left:120px;top:985px"></div><div class="bench" style="left:400px;top:985px"></div><div class="bench" style="left:680px;top:985px"></div>
+  <div class="lamp" style="left:260px;top:960px"></div><div class="lamp" style="left:560px;top:960px"></div><div class="lamp" style="left:820px;top:960px"></div>
+  <div class="palm" style="left:60px;top:850px;height:70px"></div><div class="palm" style="left:780px;top:800px;height:60px"></div>
+  <div id="river"></div><div id="farbank"></div>
+  <div class="flight" style="left:120px"></div><div class="flight" style="left:300px"></div><div class="flight" style="left:470px"></div><div class="flight" style="left:640px"></div><div class="flight" style="left:810px"></div>
+  <div class="lbl" style="left:650px;top:1164px;font-size:12px;background:rgba(247,246,238,.75)">강 건너편은 태국</div>
+
+  <div id="people"></div>
+  <div id="tint"></div>
+</div></div>
+
+<div id="log"></div>
+<button id="peek"></button>
+
+<div id="bar">
+  <div id="emo"><button data-e="👋" title="인사">👋</button><button data-e="⛳" title="나이스샷">⛳</button><button data-e="🍺" title="건배">🍺</button><button data-e="♨️" title="쉬는 중">♨️</button><button data-e="🙏" title="고마워요">🙏</button></div>
+  <input id="say" maxlength="40" placeholder="한마디 남기기 (저장되지 않아요)" autocomplete="off">
+  <button id="sendBtn">보내기</button>
+</div>
+
+<section id="sheet" aria-live="polite">
+  <header><div><p class="ey" id="sEy"></p><h2 id="sTitle"></h2></div><button id="closeSheet" aria-label="닫기">✕</button></header>
+  <div id="sheetBody"></div>
+</section>
+
+<div id="gate">
+  <div class="gbox">
+    <p class="ey">VIENTIANE · LAOS</p>
+    <h2>라오스 골프 라운지</h2>
+    <p class="sub">페어웨이를 걷고, 라운드 후 쉬고, 메콩강 노을을 보는 곳.<br>모르는 골퍼들과 잠시 머물다 가세요.</p>
+    <label for="nick">이름 (닉네임)</label>
+    <input id="nick" maxlength="10" placeholder="예: 버디왕, 해운대김프로">
+    <label>몇 명이서 치러 오셨어요?</label>
+    <div class="party"><button data-n="2">2명</button><button data-n="3">3명</button><button data-n="4">4명</button><button data-n="5">5명</button></div>
+    <p id="gReco"></p>
+    <button id="enter" disabled>라운지 입장하기</button>
+    <p class="fine">대화는 저장되지 않고, 나가면 사라져요.<br>화면을 눌러 걸어 다니고, 노란 표지판을 누르면 안내가 열려요.</p>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+(() => {
+'use strict';
+const CFG = Object.assign({room:'laos-lounge', productUrl:'#', contact:''}, window.LAOS_CFG || {});
+const W = 900, H = 1200, SPEED = 150;
+const $ = s => document.querySelector(s);
+const world = $('#world'), stage = $('#stage'), people = $('#people');
+const COLORS = ['#e9572f','#3fb3b0','#7b5ea7','#2f7fc1','#d6a84a','#1b7a4c','#c2457a','#5d6f66'];
+const AVS = ['🏌️','⛳','🐘','🌴','🍺','☀️','🦜','🥭'];
+const store = { get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}} };
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rid = () => (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)+Date.now().toString(36));
+
+/* ---------- zones & walkable area ---------- */
+const ZONES = {
+  club:  {x:240,y:30,w:420,h:240,  name:'클럽하우스', icon:'🏡'},
+  fair:  {x:30,y:300,w:410,h:410,  name:'아침 페어웨이', icon:'⛳'},
+  lounge:{x:470,y:300,w:400,h:410, name:'라운드 후 라운지', icon:'♨️'},
+  river: {x:0,y:740,w:900,h:280,   name:'메콩강변', icon:'🌅'}
+};
+function zoneAt(x,y){ for(const k in ZONES){const z=ZONES[k]; if(x>=z.x&&x<=z.x+z.w&&y>=z.y&&y<=z.y+z.h) return k;} return null; }
+function clampPt(x,y){ x=Math.max(20,Math.min(W-20,x)); y=Math.max(70,Math.min(1010,y)); return [x,y]; }
+
+/* ---------- scale world to screen ---------- */
+let S = 1, OX = 0, OY = 0, CAM = false, SR = null;
+function fit(){
+  SR = stage.getBoundingClientRect();
+  const fitS = Math.min((SR.width-16)/W, (SR.height-16)/H);
+  S = SR.width < 700 ? Math.max(fitS, Math.min(0.7, SR.width/560)) : fitS;
+  CAM = S > fitS + 0.01;
+  if(!CAM){ OX = (SR.width - W*S)/2; OY = (SR.height - H*S)/2; }
+  place();
+}
+function place(){ world.style.transform = `translate(${OX}px,${OY}px) scale(${S})`; }
+function follow(x,y){
+  if(!CAM) return;
+  const cl=(v,a,b)=>Math.max(Math.min(v,b),a);
+  const tx = W*S<SR.width ? (SR.width-W*S)/2 : cl(SR.width/2 - x*S, SR.width - W*S - 8, 8);
+  const ty = H*S<SR.height ? (SR.height-H*S)/2 : cl(SR.height*0.55 - y*S, SR.height - H*S - 8, 8);
+  OX += (tx-OX)*0.12; OY += (ty-OY)*0.12; place();
+}
+addEventListener('resize', fit); fit();
+
+/* ---------- Laos clock & day/night ---------- */
+function laosNow(){ const d=new Date(); return new Date(d.getTime()+ (d.getTimezoneOffset()+420)*60000); }
+function tick(){
+  const t = laosNow(), h = t.getHours(), m = t.getMinutes();
+  $('#clock').textContent = `라오스 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  let tint='transparent', night=false;
+  if(h>=17&&h<19){ tint='rgba(255,140,60,.16)'; night = h>=18; }
+  else if(h>=19||h<5){ tint='rgba(20,30,70,.38)'; night=true; }
+  else if(h>=5&&h<7){ tint='rgba(255,190,140,.12)'; }
+  $('#tint').style.background = tint; world.classList.toggle('night', night);
+}
+tick(); setInterval(tick, 30000);
+
+/* ---------- people ---------- */
+const me = { id: rid(), nick:'', color: COLORS[Math.floor(Math.random()*COLORS.length)], av: AVS[Math.floor(Math.random()*AVS.length)], party:4, x:450, y:240, tx:450, ty:240, st:'' };
+const P = new Map(); // id -> {d, el, x,y,tx,ty, seen}
+function mkEl(d, isMe){
+  const el = document.createElement('div'); el.className = 'p' + (isMe?' me':'');
+  el.innerHTML = `<div class="sh"></div><div class="av"></div><div class="st"></div><div class="nm"></div><div class="bub"></div>`;
+  people.appendChild(el); return el;
+}
+function paint(o){
+  const d=o.d, el=o.el;
+  el.querySelector('.av').style.background = d.color || '#888';
+  el.querySelector('.av').textContent = d.av || '⛳';
+  el.querySelector('.nm').innerHTML = esc(d.nick||'골퍼') + (d.party?`<em>${d.party}인</em>`:'');
+  el.querySelector('.st').textContent = d.st || '';
+}
+function upsert(d, isMe){
+  let o = P.get(d.id);
+  if(!o){ o = {d, el: mkEl(d,isMe), x:d.x??450, y:d.y??240, tx:d.x??450, ty:d.y??240}; P.set(d.id,o); }
+  else { o.d = Object.assign(o.d, d); }
+  paint(o); return o;
+}
+function removeP(id){ const o=P.get(id); if(o){ o.el.remove(); P.delete(id);} }
+function bubble(id, text, big){
+  const o=P.get(id); if(!o) return;
+  const b=o.el.querySelector('.bub'); b.textContent=text; b.classList.toggle('big',!!big); b.classList.add('on');
+  clearTimeout(o.bt); o.bt=setTimeout(()=>b.classList.remove('on'), big?3000:6500);
+}
+function updateCount(){
+  const n = P.size;
+  const narrow = innerWidth < 560;
+  $('#count').innerHTML = n>1 ? (narrow ? `<b>${n}명</b> 머무는 중` : `지금 <b>${n}명</b>이 라오스에 머무는 중`) : (narrow ? '혼자 구경 중' : '혼자 둘러보는 중');
+}
+
+/* ---------- loop ---------- */
+let last = performance.now();
+function loop(t){
+  const dt = Math.min(.05,(t-last)/1000); last=t;
+  for(const [id,o] of P){
+    const dx=o.tx-o.x, dy=o.ty-o.y, dist=Math.hypot(dx,dy);
+    if(dist>1){ const s=Math.min(dist, SPEED*dt); o.x+=dx/dist*s; o.y+=dy/dist*s; o.el.classList.add('walk'); }
+    else if(o.el.classList.contains('walk')){ o.x=o.tx; o.y=o.ty; o.el.classList.remove('walk'); if(id===me.id) arrived(); }
+    o.el.style.transform = `translate(${o.x}px,${o.y}px)`;
+    o.el.style.zIndex = Math.round(o.y);
+  }
+  const mo=P.get(me.id); if(mo) follow(mo.x,mo.y);
+  requestAnimationFrame(loop);
+}
+
+/* ---------- transport (Supabase realtime or local preview) ---------- */
+const T = { mode:'solo', send(){}, track(){}, onPeers:null, onEvent:null };
+function startLocal(){
+  T.mode='preview';
+  let bc=null; try{ bc = new BroadcastChannel('laos-lounge-'+CFG.room); }catch(e){}
+  const seen = new Map();
+  const emitPeers = () => { const now=Date.now(); for(const [k,v] of seen) if(now-v.t>15000) seen.delete(k); T.onPeers && T.onPeers([...seen.values()].map(v=>v.d)); };
+  if(bc){
+    bc.onmessage = ({data:m}) => {
+      if(!m||m.from===me.id) return;
+      if(m.k==='pres'){ seen.set(m.from,{d:m.d,t:Date.now()}); emitPeers(); }
+      else if(m.k==='bye'){ seen.delete(m.from); emitPeers(); }
+      else if(m.k==='hello'){ bc.postMessage({k:'pres',from:me.id,d:presence()}); }
+      else if(m.k==='ev'){ T.onEvent && T.onEvent(m.e, m.d); }
+    };
+    T.send = (e,d) => bc.postMessage({k:'ev',from:me.id,e,d});
+    T.track = d => bc.postMessage({k:'pres',from:me.id,d});
+    bc.postMessage({k:'hello',from:me.id});
+    setInterval(()=>{ bc.postMessage({k:'pres',from:me.id,d:presence()}); emitPeers(); }, 5000);
+    addEventListener('pagehide', ()=>bc.postMessage({k:'bye',from:me.id}));
+  }
+  setMode();
+}
+function startSupabase(){
+  const s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js';
+  s.onerror = startLocal;
+  s.onload = () => {
+    try{
+      const sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {realtime:{params:{eventsPerSecond:8}}});
+      const ch = sb.channel(CFG.room, {config:{presence:{key:me.id}, broadcast:{self:false}}});
+      ch.on('presence',{event:'sync'},()=>{
+        const st = ch.presenceState(), list=[];
+        for(const k in st){ if(k===me.id) continue; const arr=st[k]; if(arr&&arr.length) list.push(arr[arr.length-1]); }
+        T.onPeers && T.onPeers(list);
+      });
+      ch.on('broadcast',{event:'ev'},({payload})=>{ if(payload&&payload.from!==me.id) T.onEvent && T.onEvent(payload.e, payload.d); });
+      let ready=false, pending=null;
+      T.send = (e,d) => { if(ready) ch.send({type:'broadcast',event:'ev',payload:{from:me.id,e,d}}); };
+      T.track = d => { if(ready) ch.track(d); else pending=d; };
+      ch.subscribe(st => {
+        if(st==='SUBSCRIBED'){ ready=true; T.mode='live'; setMode(); ch.track(pending||presence()); }
+        else if(st==='CHANNEL_ERROR'||st==='TIMED_OUT'){ T.mode='solo'; setMode(); }
+      });
+      addEventListener('pagehide', ()=>{ try{ch.untrack(); sb.removeChannel(ch);}catch(e){} });
+    }catch(e){ startLocal(); }
+  };
+  document.head.appendChild(s);
+}
+function setMode(){
+  const c=$('#modeChip');
+  if(T.mode==='live'){ c.textContent='🟢 함께 모드'; c.className='chip'; }
+  else { c.textContent = T.mode==='preview' ? '미리보기 모드' : '혼자 모드'; c.className='chip solo'; }
+}
+function presence(){ return {id:me.id,nick:me.nick,color:me.color,av:me.av,party:me.party,x:Math.round(me.x),y:Math.round(me.y),st:me.st}; }
+
+T.onPeers = list => {
+  const ids = new Set([me.id]);
+  for(const d of list){
+    if(!d||!d.id||d.id===me.id) continue;
+    d.nick = String(d.nick||'골퍼').slice(0,10);
+    ids.add(d.id);
+    const fresh = !P.has(d.id);
+    const o = upsert(d,false);
+    if(fresh){ o.x=o.tx=d.x; o.y=o.ty=d.y; }
+    else if(Math.hypot(o.tx-d.x,o.ty-d.y)>4 && !o.el.classList.contains('walk')){ o.tx=d.x; o.ty=d.y; }
+  }
+  for(const id of [...P.keys()]) if(!ids.has(id)) removeP(id);
+  updateCount();
+};
+T.onEvent = (e,d) => {
+  if(!d||!d.id||!P.has(d.id)) return;
+  const o=P.get(d.id);
+  if(e==='mv'){ const [x,y]=clampPt(+d.tx,+d.ty); o.tx=x; o.ty=y; }
+  else if(e==='say'){ const t=clean(String(d.t||'').slice(0,40)); if(t){ bubble(d.id,t); logLine(o.d.nick,t); } }
+  else if(e==='emo'){ if(EMO.includes(d.e)) bubble(d.id,d.e,true); }
+  else if(e==='st'){ o.d.st = d.st==='♨️'?'♨️':''; paint(o); }
+};
+
+/* ---------- my actions ---------- */
+const EMO = ['👋','⛳','🍺','♨️','🙏'];
+let moveSentAt=0;
+world.addEventListener('pointerdown', ev => {
+  if(ev.target.closest('.sign')) return;
+  const r=world.getBoundingClientRect();
+  const [x,y] = clampPt((ev.clientX-r.left)/S, (ev.clientY-r.top)/S);
+  goTo(x,y);
+  const t=document.createElement('div'); t.className='tap'; t.style.left=x+'px'; t.style.top=y+'px'; world.appendChild(t); setTimeout(()=>t.remove(),700);
+});
+function goTo(x,y){
+  const o=P.get(me.id); if(!o) return;
+  o.tx=me.tx=x; o.ty=me.ty=y;
+  const now=Date.now(); if(now-moveSentAt>120){ moveSentAt=now; T.send('mv',{id:me.id,tx:Math.round(x),ty:Math.round(y)}); }
+  if(me.st){ me.st=''; o.d.st=''; paint(o); T.send('st',{id:me.id,st:''}); }
+}
+let curZone=null; const visited=new Set();
+function arrived(){
+  const o=P.get(me.id); me.x=o.x; me.y=o.y; T.track(presence());
+  const z = zoneAt(me.x,me.y);
+  if(z!==curZone){ curZone=z; onZone(z); }
+}
+function onZone(z){
+  const pk=$('#peek');
+  if(!z){ pk.style.display='none'; return; }
+  pk.textContent = `${ZONES[z].icon} ${ZONES[z].name} · 안내 보기`; pk.style.display='block'; pk.onclick=()=>openSheet(z);
+  if(!visited.has(z)){ visited.add(z); setTimeout(()=>{ if(curZone===z) openSheet(z); }, 450); }
+  sound.zone(z);
+}
+document.querySelectorAll('.sign').forEach(s => s.addEventListener('pointerdown', ev => { ev.stopPropagation(); openSheet(s.dataset.zone); }));
+
+/* chat */
+const BAD = ['시발','씨발','병신','개새','좆','fuck','sex','섹스','도박사이트','카지노사이트','http','www.','텔레그램','카톡방'];
+function clean(t){ let s=t; for(const b of BAD){ if(s.toLowerCase().includes(b)) s=s.split(new RegExp(b.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi')).join('♥'); } return s.trim(); }
+let lastSay=0;
+function say(){
+  const inp=$('#say'); const t=clean(inp.value.slice(0,40)); if(!t) return;
+  const now=Date.now(); if(now-lastSay<1500) return; lastSay=now;
+  inp.value=''; bubble(me.id,t); logLine(me.nick,t); T.send('say',{id:me.id,t});
+}
+$('#sendBtn').onclick=say;
+$('#say').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing) say(); });
+document.querySelectorAll('#emo button').forEach(b=>b.onclick=()=>{
+  const e=b.dataset.e, now=Date.now(); if(now-lastSay<800) return; lastSay=now;
+  bubble(me.id,e,true); T.send('emo',{id:me.id,e});
+  if(e==='♨️'){ me.st='♨️'; const o=P.get(me.id); o.d.st='♨️'; paint(o); T.send('st',{id:me.id,st:'♨️'}); T.track(presence()); }
+});
+function logLine(n,t){
+  const d=document.createElement('div'); d.innerHTML=`<b>${esc(n)}</b>${esc(t)}`; const L=$('#log'); L.appendChild(d);
+  while(L.children.length>5) L.firstChild.remove(); setTimeout(()=>d.remove(),12500);
+}
+
+/* ---------- zone sheets ---------- */
+const RECO = {
+  2:{t:'성수기에도 둘이서', p:'부영 · 롱비엔은 성수기에도 2인 플레이가 돼요. 4명 맞추느라 미루지 않아도 됩니다.', l:['2인 출발 상품 (아론 호텔 4성 · NO가이드)','부영 · 롱비엔 18홀 라운드','라운드 후 메콩강변 야시장까지 도보']},
+  3:{t:'셋이서 한 조로', p:'대부분 골프장에서 3인 플레이가 가능해요.', l:['다색골프로 매일 다른 골프장','홀수 인원이면 혼자 카트 타는 1인만 +$20 / 18홀','골프장 · 티타임별 조건은 예약 시 안내']},
+  4:{t:'넷이면 선택지가 가장 넓어요', p:'다색골프부터 골프장 옆 숙소, 관광 포함까지 고르기만 하면 돼요.', l:['다색골프 4성 · 매일 다른 골프장','골프텔 36홀 (부영 · 단사반 · 로얄크릭)','골프 + 방비엥 관광']},
+  5:{t:'다섯 명, 팀 나누지 말고 함께', p:'한국에선 5명이면 두 팀으로 나뉘죠. 라오스는 대부분 골프장에서 5인 1조가 가능해요.', l:['다섯 명이 한 조로 라운드','카트 배정 · 싱글카트 조건은 예약 시 확인','라운드 후 다 같이 메콩강변 건배']}
+};
+function recoHTML(n){ const r=RECO[n]; return `<div class="reco"><h3>${n}명 · ${r.t}</h3><p>${r.p}</p><ul>${r.l.map(x=>`<li>${x}</li>`).join('')}</ul></div>`; }
+const cta = () => `<div class="row"><a class="btn y" href="${esc(CFG.productUrl)}" target="_blank" rel="noopener">라오스 골프 상품 보기 ↗</a>${CFG.contact?`<span class="btn l">문의 · ${esc(CFG.contact)}</span>`:''}</div>`;
+const fig = (src,cap) => `<figure><img loading="lazy" src="assets/${src}" alt="${esc(cap)}"><figcaption>${cap}</figcaption></figure>`;
+const SHEETS = {
+  club: () => ({ey:'CLUBHOUSE · 일행 맞춤 안내', t:'우리 일행엔 이런 라오스 골프', b:`
+    <div class="tabs">${[2,3,4,5].map(n=>`<button data-n="${n}" class="${n==me.party?'on':''}">${n}명</button>`).join('')}</div>
+    <div id="recoBox">${recoHTML(me.party)}</div>
+    <p class="note">부산 · 대구에서 밤 출발 직항 약 5시간 · 시차 −2시간 · 30일 무비자 · 12~2월은 비가 거의 없는 건기예요.</p>${cta()}`}),
+  fair: () => ({ey:'MORNING FAIRWAY · 코스 구경', t:'시내 호텔에서 차로 30~50분, 대표 골프장', b:`
+    <div class="ph">${fig('booyoung.jpg','부영 씨게임즈 · 27홀')}${fig('longvien.jpg','롱비엔 · 27홀')}${fig('lakeview.jpg','레이크뷰 · 18홀')}${fig('laocc.jpg','라오CC · 18홀')}${fig('mekong.jpg','메콩GC · 18홀')}</div>
+    <div class="cards">
+      <div class="card"><b>부영 씨게임즈</b><span>27홀 · 성수기 2인 가능</span><p>동남아시안게임 코스. 좁은 페어웨이에 까다로운 그린, 도전하는 맛이 있어요.</p></div>
+      <div class="card"><b>롱비엔</b><span>27홀 · 성수기 2인 가능</span><p>라오스 첫 27홀. 호수·벙커·초보 편한 코스까지 골라 치기 좋아요.</p></div>
+      <div class="card"><b>레이크뷰 · 라오CC · 메콩</b><span>18홀 · 시내 15~30분</span><p>매일 다른 골프장을 도는 다색골프에 주로 들어가요.</p></div>
+    </div>
+    <p class="note">대부분 1인 1캐디 · 2인 1카트. 인원별 플레이는 골프장·티타임에 따라 달라요.</p>${cta()}`}),
+  lounge: () => ({ey:'AFTER ROUND · 쉬어 가기', t:'라운드 끝나면, 오후는 천천히', b:`
+    <div class="ph">${fig('aaron_pool.jpg','아론 호텔 루프탑 수영장')}${fig('golftel_pool.jpg','부영 골프텔 수영장')}${fig('housta.jpg','하우스타 빌리지 풀빌라')}</div>
+    <p style="font-size:14px;line-height:1.7;color:#2f4440;margin-top:6px">땀 흘린 오전 라운드 뒤엔 수영장에서 몸을 풀고, 라오스 전통 마사지 60분으로 하루를 마무리해요. 아래 ♨️ 버튼을 누르면 다른 분들에게도 “쉬는 중”으로 보여요.</p>
+    <div class="row"><button class="btn d" id="restBtn">♨️ 여기서 쉬기</button></div>
+    <p class="note">마사지는 별도 비용(마사지 포함 상품 제외) · 숙소 위치에 따라 이용 시설이 달라요.</p>${cta()}`}),
+  river: () => ({ey:'MEKONG RIVERSIDE · 노을 · 야시장', t:'저녁엔 메콩강 노을 보며 한 잔', b:`
+    <div class="ph">${fig('mekong_ai.jpg','메콩강 풍경 (연출 이미지)')}${fig('market_ai.jpg','메콩강 야시장 (연출 이미지)')}${fig('toast.jpg','라운드 후 저녁 (연출 이미지)')}</div>
+    <p style="font-size:14px;line-height:1.7;color:#2f4440;margin-top:6px">강 건너편이 바로 태국이에요. 메콩강변 호텔에 묵으면 야시장까지 걸어서 다녀올 수 있고, 비어라오 한 잔에 한식당 소주까지 부담 없이 즐겨요.</p>
+    <div class="row"><button class="btn d" id="cheersBtn">🍺 다 같이 건배</button></div>
+    <p class="note">야시장 도보 여부는 호텔마다 달라요 (아론 리버뷰 기준 도보 5~10분).</p>${cta()}`})
+};
+function openSheet(z){
+  const s=SHEETS[z](); $('#sEy').textContent=s.ey; $('#sTitle').textContent=s.t; $('#sheetBody').innerHTML=s.b; $('#sheet').classList.add('on');
+  if(z==='club') $('#sheetBody').querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ $('#sheetBody').querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b)); $('#recoBox').innerHTML=recoHTML(+b.dataset.n); });
+  const rb=$('#restBtn'); if(rb) rb.onclick=()=>{ document.querySelector('#emo button[data-e="♨️"]').click(); closeSheet(); };
+  const cb=$('#cheersBtn'); if(cb) cb.onclick=()=>{ document.querySelector('#emo button[data-e="🍺"]').click(); closeSheet(); };
+}
+function closeSheet(){ $('#sheet').classList.remove('on'); }
+$('#closeSheet').onclick=closeSheet;
+
+/* ---------- ambient sound (WebAudio, no files) ---------- */
+const sound = (() => {
+  let ctx=null, on=false, water=null, birdTimer=null, zone=null;
+  function init(){
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const len=ctx.sampleRate*4, buf=ctx.createBuffer(1,len,ctx.sampleRate), d=buf.getChannelData(0); let l=0;
+    for(let i=0;i<len;i++){ const w=Math.random()*2-1; l=(l+0.02*w)/1.02; d[i]=l*3.2; }
+    const src=ctx.createBufferSource(); src.buffer=buf; src.loop=true;
+    const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=700;
+    water=ctx.createGain(); water.gain.value=0; src.connect(lp).connect(water).connect(ctx.destination); src.start();
+  }
+  function chirp(){
+    if(!on||!ctx) return;
+    const day = !world.classList.contains('night');
+    if(day && (zone==='fair'||zone==='club'||zone===null)){
+      const n=2+Math.floor(Math.random()*3), base=2400+Math.random()*1400;
+      for(let i=0;i<n;i++){
+        const t=ctx.currentTime+i*0.13, o=ctx.createOscillator(), g=ctx.createGain();
+        o.type='sine'; o.frequency.setValueAtTime(base,t); o.frequency.exponentialRampToValueAtTime(base*1.5,t+0.08);
+        g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.035,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+0.11);
+        o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+0.12);
+      }
+    }
+    birdTimer=setTimeout(chirp, 3500+Math.random()*6000);
+  }
+  function level(){ if(!water) return; const v = zone==='river'?0.32 : zone==='lounge'?0.14 : 0.05; water.gain.setTargetAtTime(on?v:0, ctx.currentTime, 0.8); }
+  return {
+    toggle(){ if(!ctx) init(); on=!on; if(ctx.state==='suspended') ctx.resume(); level(); clearTimeout(birdTimer); if(on) chirp(); return on; },
+    zone(z){ zone=z; if(ctx) level(); }
+  };
+})();
+$('#soundBtn').onclick = () => { const on=sound.toggle(); $('#soundBtn').textContent = on?'🔊 소리':'🔇 소리'; };
+
+/* ---------- entrance ---------- */
+const nickI=$('#nick'); nickI.value = store.get('laos_nick')||'';
+let party = +(store.get('laos_party')||0);
+function gateState(){
+  document.querySelectorAll('.party button').forEach(b=>b.classList.toggle('on', +b.dataset.n===party));
+  $('#gReco').textContent = party ? `${party}명 · ${RECO[party].t}` : '';
+  $('#enter').disabled = !(nickI.value.trim().length>=1 && party);
+}
+document.querySelectorAll('.party button').forEach(b=>b.onclick=()=>{ party=+b.dataset.n; gateState(); });
+nickI.addEventListener('input', gateState); gateState();
+$('#enter').onclick = () => {
+  me.nick = clean(nickI.value.trim()).slice(0,10) || '골퍼'; me.party = party;
+  store.set('laos_nick', me.nick); store.set('laos_party', String(party));
+  $('#gate').remove();
+  const [sx,sy] = clampPt(320+Math.random()*260, 228+Math.random()*34);
+  me.x=me.tx=sx; me.y=me.ty=sy;
+  const o=upsert(presence(), true); o.x=o.tx=sx; o.y=o.ty=sy;
+  updateCount(); requestAnimationFrame(loop);
+  if(CFG.supabaseUrl && CFG.supabaseAnonKey) startSupabase(); else startLocal();
+  setTimeout(()=>{ curZone='club'; visited.add('club'); onZone('club'); openSheet('club'); }, 500);
+  setTimeout(()=>bubble(me.id,'안녕하세요 👋'), 900);
+};
+setMode();
+})();
+</script>
+</body>
+</html>
