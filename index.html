@@ -30,7 +30,7 @@ input{font:inherit}
 
 /* ---------- Stage / World ---------- */
 #stage{position:fixed;left:0;right:0;top:52px;bottom:64px;overflow:hidden}
-#world{position:absolute;left:0;top:0;width:900px;height:1200px;transform-origin:0 0;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);background:#9ccf7f;cursor:pointer;user-select:none}
+#world{position:absolute;left:0;top:0;width:900px;height:1200px;transform-origin:0 0;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);background:#c9a35c url(assets/map.jpg) 0 0/900px 1200px no-repeat;cursor:pointer;user-select:none}
 .z{position:absolute;border-radius:28px}
 .lbl{position:absolute;font-size:15px;font-weight:900;color:var(--dk);background:rgba(247,246,238,.92);padding:5px 13px;border-radius:20px;box-shadow:0 3px 10px rgba(0,0,0,.12);white-space:nowrap;pointer-events:none}
 .lbl small{font-weight:700;color:var(--mut);margin-left:5px}
@@ -187,54 +187,15 @@ input{font:inherit}
 </div>
 
 <div id="stage"><div id="world">
-  <!-- paths -->
-  <div class="path" style="left:430px;top:260px;width:40px;height:500px"></div>
-  <div class="path" style="left:200px;top:700px;width:30px;height:60px"></div>
-  <div class="path" style="left:660px;top:700px;width:30px;height:60px"></div>
-  <div class="path" style="left:60px;top:930px;width:780px;height:26px"></div>
-
-  <!-- clubhouse -->
-  <div class="z" id="club">
-    <div class="roof"></div>
-    <div class="house"><div class="win" style="left:24px"></div><div class="win" style="left:180px"></div><div class="door"></div></div>
-  </div>
-  <div class="lbl" style="left:390px;top:12px">🏡 클럽하우스<small>입구 · 일행 맞춤 안내</small></div>
-  <div class="sign" style="left:600px;top:190px" data-zone="club">📋</div>
-
-  <!-- fairway -->
-  <div class="z" id="fair"><div class="green"></div><div class="pin"></div><div class="bunker"></div><div class="tee"></div></div>
-  <div class="lbl" style="left:60px;top:286px">⛳ 아침 페어웨이<small>코스 구경</small></div>
-  <div class="sign" style="left:370px;top:640px" data-zone="fair">⛳</div>
-  <div class="tree" style="left:44px;top:420px;width:60px;height:60px"></div>
-  <div class="tree" style="left:350px;top:330px;width:46px;height:46px"></div>
-  <div class="tree" style="left:300px;top:560px;width:56px;height:56px"></div>
-  <div class="tree" style="left:90px;top:610px;width:40px;height:40px"></div>
-
-  <!-- lounge -->
-  <div class="z" id="lounge">
-    <div class="pool"></div>
-    <div class="steam" style="left:150px;top:110px"></div><div class="steam" style="left:200px;top:100px;animation-delay:1.1s"></div><div class="steam" style="left:250px;top:120px;animation-delay:2.2s"></div>
-    <div class="lounger" style="left:40px;top:270px"></div><div class="lounger" style="left:110px;top:270px"></div><div class="lounger" style="left:180px;top:270px"></div><div class="lounger" style="left:250px;top:270px"></div>
-    <div class="lantern" style="left:20px;top:20px"></div><div class="lantern" style="left:360px;top:20px"></div><div class="lantern" style="left:360px;top:370px"></div>
-  </div>
-  <div class="lbl" style="left:500px;top:286px">♨️ 라운드 후 라운지<small>쉬어 가기</small></div>
-  <div class="sign" style="left:800px;top:640px" data-zone="lounge">♨️</div>
-
-  <!-- riverside -->
-  <div class="z" id="river-bank"></div>
-  <div class="lbl" style="left:30px;top:760px">🌅 메콩강변<small>노을 · 야시장</small></div>
-  <div class="sign" style="left:820px;top:880px" data-zone="river">🌅</div>
-  <div class="stall" style="left:330px"><i style="background:#e9572f"></i><b></b></div>
-  <div class="stall" style="left:420px"><i style="background:#f6c945"></i><b></b></div>
-  <div class="stall" style="left:510px"><i style="background:#3fb3b0"></i><b></b></div>
-  <div class="stall" style="left:600px"><i style="background:#e9572f"></i><b></b></div>
-  <div class="bench" style="left:120px;top:985px"></div><div class="bench" style="left:400px;top:985px"></div><div class="bench" style="left:680px;top:985px"></div>
-  <div class="lamp" style="left:260px;top:960px"></div><div class="lamp" style="left:560px;top:960px"></div><div class="lamp" style="left:820px;top:960px"></div>
-  <div class="palm" style="left:60px;top:850px;height:70px"></div><div class="palm" style="left:780px;top:800px;height:60px"></div>
-  <div id="river"></div><div id="farbank"></div>
-  <div class="flight" style="left:120px"></div><div class="flight" style="left:300px"></div><div class="flight" style="left:470px"></div><div class="flight" style="left:640px"></div><div class="flight" style="left:810px"></div>
-  <div class="lbl" style="left:650px;top:1164px;font-size:12px;background:rgba(247,246,238,.75)">강 건너편은 태국</div>
-
+  <div class="lbl" style="left:372px;top:6px">🏡 클럽하우스<small>일행 맞춤 안내</small></div>
+  <div class="sign" style="left:300px;top:186px" data-zone="club">📋</div>
+  <div class="lbl" style="left:24px;top:250px">⛳ 아침 페어웨이<small>코스 구경</small></div>
+  <div class="sign" style="left:250px;top:560px" data-zone="fair">⛳</div>
+  <div class="lbl" style="left:620px;top:262px">♨️ 라운드 후 라운지<small>쉬어 가기</small></div>
+  <div class="sign" style="left:560px;top:600px" data-zone="lounge">♨️</div>
+  <div class="lbl" style="left:24px;top:730px">🌅 메콩강변<small>노을 · 야시장</small></div>
+  <div class="sign" style="left:820px;top:830px" data-zone="river">🌅</div>
+  <div class="lbl" style="left:660px;top:1100px;font-size:12px;background:rgba(247,246,238,.7)">강 건너편은 태국</div>
   <div id="people"></div>
   <div id="tint"></div>
 </div></div>
@@ -304,13 +265,13 @@ const rid = () => (crypto.randomUUID ? crypto.randomUUID() : Math.random().toStr
 
 /* ---------- zones & walkable area ---------- */
 const ZONES = {
-  club:  {x:240,y:30,w:420,h:240,  name:'클럽하우스', icon:'🏡'},
-  fair:  {x:30,y:300,w:410,h:410,  name:'아침 페어웨이', icon:'⛳'},
-  lounge:{x:470,y:300,w:400,h:410, name:'라운드 후 라운지', icon:'♨️'},
-  river: {x:0,y:740,w:900,h:280,   name:'메콩강변', icon:'🌅'}
+  club:  {x:190,y:0,w:570,h:245,   name:'클럽하우스', icon:'🏡'},
+  fair:  {x:0,y:245,w:470,h:475,   name:'아침 페어웨이', icon:'⛳'},
+  lounge:{x:500,y:245,w:400,h:475, name:'라운드 후 라운지', icon:'♨️'},
+  river: {x:0,y:720,w:900,h:215,   name:'메콩강변', icon:'🌅'}
 };
 function zoneAt(x,y){ for(const k in ZONES){const z=ZONES[k]; if(x>=z.x&&x<=z.x+z.w&&y>=z.y&&y<=z.y+z.h) return k;} return null; }
-function clampPt(x,y){ x=Math.max(20,Math.min(W-20,x)); y=Math.max(70,Math.min(1010,y)); return [x,y]; }
+function clampPt(x,y){ x=Math.max(20,Math.min(W-20,x)); y=Math.max(150,Math.min(915,y)); return [x,y]; }
 
 /* ---------- scale world to screen ---------- */
 let S = 1, OX = 0, OY = 0, CAM = false, SR = null;
@@ -658,7 +619,7 @@ $('#enter').onclick = () => {
   store.set('laos_nick', me.nick); store.set('laos_party', String(party));
   $('#gate').remove();
   if(ROOM){ const rc=$('#roomChip'); rc.textContent='👥 '+ROOM+' 방'; rc.style.display='inline-block'; }
-  const [sx,sy] = clampPt(320+Math.random()*260, 228+Math.random()*34);
+  const [sx,sy] = clampPt(400+Math.random()*130, 222+Math.random()*30);
   me.x=me.tx=sx; me.y=me.ty=sy;
   const o=upsert(presence(), true); o.x=o.tx=sx; o.y=o.ty=sy;
   updateCount(); requestAnimationFrame(loop);
