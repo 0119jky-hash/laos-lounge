@@ -144,6 +144,17 @@ input{font:inherit}
 .reco p{font-size:14px;line-height:1.6;margin-top:6px;color:#dfe9e3}
 .reco ul{margin:8px 0 0 18px;font-size:13.5px;line-height:1.7;color:#dfe9e3}
 
+/* ---------- Inquiry modal ---------- */
+#inq{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(10,30,24,.6)}
+#inq.on{display:flex}
+#inq .gbox{max-height:92vh;overflow:auto}
+#inq select,#inq textarea{width:100%;border:2px solid #dcd8c8;border-radius:12px;padding:10px 12px;margin-top:6px;font:inherit;font-size:15px;background:#fff;color:var(--dk)}
+#inq textarea{height:70px;resize:none}
+.agree{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--tx);margin-top:14px;line-height:1.5}
+.agree input{width:18px;height:18px;margin-top:2px;flex:none}
+#inqMsg{font-size:13px;font-weight:700;margin-top:10px;min-height:18px}
+#roomChip{background:var(--ye);color:var(--dk);display:none}
+
 /* ---------- Entrance ---------- */
 #gate{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(10,30,24,.55)}
 #gate:before{content:"";position:fixed;inset:0;background:url(assets/hero.jpg) center/cover;filter:blur(6px) brightness(.55);transform:scale(1.06);z-index:-1}
@@ -169,6 +180,7 @@ input{font:inherit}
   <h1>라오스 골프 <span>라운지</span></h1>
   <span class="chip" id="count">혼자 둘러보는 중</span>
   <span class="chip" id="clock">라오스 --:--</span>
+  <span class="chip" id="roomChip"></span>
   <span class="sp"></span>
   <span class="chip" id="modeChip"></span>
   <button id="soundBtn">🔇 소리</button>
@@ -241,6 +253,24 @@ input{font:inherit}
   <div id="sheetBody"></div>
 </section>
 
+<div id="inq">
+  <div class="gbox">
+    <p class="ey">CONSULTING · 상담 신청</p>
+    <h2>우리 모임에 맞는<br>라오스 골프 추천받기</h2>
+    <p class="sub">남겨주시면 담당자가 연락드려요.</p>
+    <label for="iqName">이름</label><input id="iqName" maxlength="20" placeholder="홍길동">
+    <label for="iqPhone">연락처</label><input id="iqPhone" maxlength="20" inputmode="tel" placeholder="010-0000-0000">
+    <label for="iqDep">출발지</label><select id="iqDep"><option>부산</option><option>대구</option><option>인천</option><option>아직 미정</option></select>
+    <label for="iqWhen">희망 시기</label><input id="iqWhen" maxlength="30" placeholder="예: 1월 말, 2월 중순 목요일 출발">
+    <label for="iqParty">인원</label><select id="iqParty"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6명 이상</option></select>
+    <label for="iqMemo">하고 싶은 말 (선택)</label><textarea id="iqMemo" maxlength="200" placeholder="예: 골프 + 관광 원해요, 5성급 호텔 희망"></textarea>
+    <label class="agree"><input type="checkbox" id="iqAgree"><span>[필수] 개인정보 수집·이용 동의 — 수집 항목: 이름, 연락처, 여행 희망 정보 / 목적: 여행 상담 연락 / 보유 기간: 상담 완료 후 6개월 뒤 파기. 동의하지 않으면 상담 신청이 어려워요.</span></label>
+    <p id="inqMsg"></p>
+    <button id="iqSend" class="btn y" style="width:100%;justify-content:center;margin-top:6px">상담 신청하기</button>
+    <button id="iqClose" class="btn l" style="width:100%;justify-content:center;margin-top:8px">닫기</button>
+  </div>
+</div>
+
 <div id="gate">
   <div class="gbox">
     <p class="ey">VIENTIANE · LAOS</p>
@@ -262,6 +292,8 @@ input{font:inherit}
 'use strict';
 const CFG = Object.assign({room:'laos-lounge', productUrl:'#', contact:''}, window.LAOS_CFG || {});
 const W = 900, H = 1200, SPEED = 150;
+const ROOM = (() => { try{ const r=new URLSearchParams(location.search).get('room')||''; return r.replace(/[^0-9A-Za-z가-힣_-]/g,'').slice(0,20); }catch(e){ return ''; } })();
+const CHANNEL = CFG.room + (ROOM ? ':' + ROOM : '');
 const $ = s => document.querySelector(s);
 const world = $('#world'), stage = $('#stage'), people = $('#people');
 const COLORS = ['#e9572f','#3fb3b0','#7b5ea7','#2f7fc1','#d6a84a','#1b7a4c','#c2457a','#5d6f66'];
@@ -362,10 +394,11 @@ function loop(t){
 }
 
 /* ---------- transport (Supabase realtime or local preview) ---------- */
+let SB = null;
 const T = { mode:'solo', send(){}, track(){}, onPeers:null, onEvent:null };
 function startLocal(){
   T.mode='preview';
-  let bc=null; try{ bc = new BroadcastChannel('laos-lounge-'+CFG.room); }catch(e){}
+  let bc=null; try{ bc = new BroadcastChannel('laos-lounge-'+CHANNEL); }catch(e){}
   const seen = new Map();
   const emitPeers = () => { const now=Date.now(); for(const [k,v] of seen) if(now-v.t>15000) seen.delete(k); T.onPeers && T.onPeers([...seen.values()].map(v=>v.d)); };
   if(bc){
@@ -391,7 +424,8 @@ function startSupabase(){
   s.onload = () => {
     try{
       const sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {realtime:{params:{eventsPerSecond:8}}});
-      const ch = sb.channel(CFG.room, {config:{presence:{key:me.id}, broadcast:{self:false}}});
+      SB = sb;
+      const ch = sb.channel(CHANNEL, {config:{presence:{key:me.id}, broadcast:{self:false}}});
       ch.on('presence',{event:'sync'},()=>{
         const st = ch.presenceState(), list=[];
         for(const k in st){ if(k===me.id) continue; const arr=st[k]; if(arr&&arr.length) list.push(arr[arr.length-1]); }
@@ -412,8 +446,9 @@ function startSupabase(){
 }
 function setMode(){
   const c=$('#modeChip');
-  if(T.mode==='live'){ c.textContent='🟢 함께 모드'; c.className='chip'; }
-  else { c.textContent = T.mode==='preview' ? '미리보기 모드' : '혼자 모드'; c.className='chip solo'; }
+  const nw = innerWidth < 560;
+  if(T.mode==='live'){ c.textContent = nw?'🟢':'🟢 함께 모드'; c.className='chip'; }
+  else { c.textContent = nw?'⚪':(T.mode==='preview' ? '미리보기 모드' : '혼자 모드'); c.className='chip solo'; }
 }
 function presence(){ return {id:me.id,nick:me.nick,color:me.color,av:me.av,party:me.party,x:Math.round(me.x),y:Math.round(me.y),st:me.st}; }
 
@@ -500,13 +535,15 @@ const RECO = {
   5:{t:'다섯 명, 팀 나누지 말고 함께', p:'한국에선 5명이면 두 팀으로 나뉘죠. 라오스는 대부분 골프장에서 5인 1조가 가능해요.', l:['다섯 명이 한 조로 라운드','카트 배정 · 싱글카트 조건은 예약 시 확인','라운드 후 다 같이 메콩강변 건배']}
 };
 function recoHTML(n){ const r=RECO[n]; return `<div class="reco"><h3>${n}명 · ${r.t}</h3><p>${r.p}</p><ul>${r.l.map(x=>`<li>${x}</li>`).join('')}</ul></div>`; }
-const cta = () => `<div class="row"><a class="btn y" href="${esc(CFG.productUrl)}" target="_blank" rel="noopener">라오스 골프 상품 보기 ↗</a>${CFG.contact?`<span class="btn l">문의 · ${esc(CFG.contact)}</span>`:''}</div>`;
+const cta = () => `<div class="row"><button class="btn y" data-inq="1">📝 상담 신청</button><a class="btn d" href="${esc(CFG.productUrl)}" target="_blank" rel="noopener">상품 보기 ↗</a>${CFG.contact?`<span class="btn l">문의 · ${esc(CFG.contact)}</span>`:''}</div>`;
 const fig = (src,cap) => `<figure><img loading="lazy" src="assets/${src}" alt="${esc(cap)}"><figcaption>${cap}</figcaption></figure>`;
 const SHEETS = {
   club: () => ({ey:'CLUBHOUSE · 일행 맞춤 안내', t:'우리 일행엔 이런 라오스 골프', b:`
     <div class="tabs">${[2,3,4,5].map(n=>`<button data-n="${n}" class="${n==me.party?'on':''}">${n}명</button>`).join('')}</div>
     <div id="recoBox">${recoHTML(me.party)}</div>
-    <p class="note">부산 · 대구에서 밤 출발 직항 약 5시간 · 시차 −2시간 · 30일 무비자 · 12~2월은 비가 거의 없는 건기예요.</p>${cta()}`}),
+    <p class="note">부산 · 대구에서 밤 출발 직항 약 5시간 · 시차 −2시간 · 30일 무비자 · 12~2월은 비가 거의 없는 건기예요.</p>${cta()}
+    <div class="card" style="margin-top:14px"><b>👥 우리 모임 전용 방 만들기</b><p>모임 이름을 정하면 우리끼리만 들어오는 라운지 링크가 생겨요. 단톡방에 공유해서 같이 구경하며 날짜를 정해 보세요.</p>
+    <div class="row" style="margin-top:8px"><input id="roomName" maxlength="20" placeholder="예: 해운대골프회" style="flex:1;min-width:160px;height:42px;border:2px solid #dcd8c8;border-radius:12px;padding:0 12px;font:inherit"><button class="btn d" id="roomMake">링크 만들기</button></div><p class="note" id="roomOut"></p></div>`}),
   fair: () => ({ey:'MORNING FAIRWAY · 코스 구경', t:'시내 호텔에서 차로 30~50분, 대표 골프장', b:`
     <div class="ph">${fig('booyoung.jpg','부영 씨게임즈 · 27홀')}${fig('longvien.jpg','롱비엔 · 27홀')}${fig('lakeview.jpg','레이크뷰 · 18홀')}${fig('laocc.jpg','라오CC · 18홀')}${fig('mekong.jpg','메콩GC · 18홀')}</div>
     <div class="cards">
@@ -529,10 +566,48 @@ const SHEETS = {
 function openSheet(z){
   const s=SHEETS[z](); $('#sEy').textContent=s.ey; $('#sTitle').textContent=s.t; $('#sheetBody').innerHTML=s.b; $('#sheet').classList.add('on');
   if(z==='club') $('#sheetBody').querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ $('#sheetBody').querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b)); $('#recoBox').innerHTML=recoHTML(+b.dataset.n); });
+  $('#sheetBody').querySelectorAll('[data-inq]').forEach(b=>b.onclick=openInq);
+  const rm=$('#roomMake'); if(rm) rm.onclick=makeRoom;
   const rb=$('#restBtn'); if(rb) rb.onclick=()=>{ document.querySelector('#emo button[data-e="♨️"]').click(); closeSheet(); };
   const cb=$('#cheersBtn'); if(cb) cb.onclick=()=>{ document.querySelector('#emo button[data-e="🍺"]').click(); closeSheet(); };
 }
 function closeSheet(){ $('#sheet').classList.remove('on'); }
+function makeRoom(){
+  const n=($('#roomName').value||'').replace(/[^0-9A-Za-z가-힣_-]/g,'').slice(0,20);
+  if(!n){ $('#roomOut').textContent='모임 이름을 한글·영문·숫자로 적어 주세요.'; return; }
+  const url = location.origin + location.pathname + '?room=' + encodeURIComponent(n);
+  const done = () => { $('#roomOut').innerHTML = `복사됐어요! 단톡방에 붙여넣기 하세요.<br><a href="${esc(url)}">${esc(url)}</a>`; };
+  if(navigator.share){ navigator.share({title:'우리 모임 라오스 골프 라운지', text:`${n} 라오스 골프 라운지에서 만나요 ⛳`, url}).then(done).catch(()=>{}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(url).then(done, ()=>{ $('#roomOut').innerHTML=`<a href="${esc(url)}">${esc(url)}</a>`; }); }
+  else $('#roomOut').innerHTML=`<a href="${esc(url)}">${esc(url)}</a>`;
+}
+function ensureSB(cb){
+  if(SB) return cb(SB);
+  if(!(CFG.supabaseUrl&&CFG.supabaseAnonKey)) return cb(null);
+  const go=()=>{ try{ SB = SB || window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey); cb(SB); }catch(e){ cb(null); } };
+  if(window.supabase) return go();
+  const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js'; s.onload=go; s.onerror=()=>cb(null); document.head.appendChild(s);
+}
+function openInq(){ $('#iqParty').value = String(me.party||4); $('#inqMsg').textContent=''; $('#inq').classList.add('on'); }
+$('#iqClose').onclick=()=>$('#inq').classList.remove('on');
+let inqSent=0;
+$('#iqSend').onclick=()=>{
+  const m=$('#inqMsg'); m.style.color='#c2401f';
+  const name=$('#iqName').value.trim(), phone=$('#iqPhone').value.trim();
+  if(!name) return m.textContent='이름을 적어 주세요.';
+  if(!/^[0-9+\- ]{9,20}$/.test(phone)) return m.textContent='연락처를 숫자로 적어 주세요.';
+  if(!$('#iqAgree').checked) return m.textContent='개인정보 수집·이용에 동의해 주세요.';
+  if(Date.now()-inqSent<30000) return m.textContent='이미 접수됐어요. 잠시 후 다시 시도해 주세요.';
+  const row={name:name.slice(0,20), phone:phone.slice(0,20), depart:$('#iqDep').value, period:$('#iqWhen').value.trim().slice(0,30), party:$('#iqParty').value, memo:$('#iqMemo').value.trim().slice(0,200), room:ROOM||null};
+  m.style.color='#1b7a4c'; m.textContent='보내는 중…';
+  ensureSB(async sb=>{
+    if(!sb){ m.style.color='#c2401f'; m.textContent = CFG.contact ? `지금은 접수가 어려워요. ${CFG.contact}로 문의해 주세요.` : '지금은 접수가 어려워요. 잠시 후 다시 시도해 주세요.'; return; }
+    const {error} = await sb.from('inquiries').insert(row);
+    if(error){ m.style.color='#c2401f'; m.textContent='접수 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.'; return; }
+    inqSent=Date.now(); m.style.color='#1b7a4c'; m.textContent='접수됐어요! 담당자가 곧 연락드릴게요 🙏';
+    ['#iqName','#iqPhone','#iqWhen','#iqMemo'].forEach(k=>$(k).value=''); $('#iqAgree').checked=false;
+  });
+};
 $('#closeSheet').onclick=closeSheet;
 
 /* ---------- ambient sound (WebAudio, no files) ---------- */
@@ -582,6 +657,7 @@ $('#enter').onclick = () => {
   me.nick = clean(nickI.value.trim()).slice(0,10) || '골퍼'; me.party = party;
   store.set('laos_nick', me.nick); store.set('laos_party', String(party));
   $('#gate').remove();
+  if(ROOM){ const rc=$('#roomChip'); rc.textContent='👥 '+ROOM+' 방'; rc.style.display='inline-block'; }
   const [sx,sy] = clampPt(320+Math.random()*260, 228+Math.random()*34);
   me.x=me.tx=sx; me.y=me.ty=sy;
   const o=upsert(presence(), true); o.x=o.tx=sx; o.y=o.ty=sy;
