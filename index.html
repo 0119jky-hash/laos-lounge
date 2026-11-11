@@ -24,6 +24,7 @@ input,select,textarea{font:inherit}
 .chip{font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--dk2);color:#cfe1d8;white-space:nowrap}
 .chip b{color:var(--ye)}
 #hud .sp{flex:1}
+.chip:empty{display:none}
 .hbtn{background:var(--dk2);color:var(--iv);border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;white-space:nowrap}
 .hbtn.on{background:var(--ye);color:var(--dk)}
 #roomChip{background:var(--ye);color:var(--dk);display:none}
@@ -79,10 +80,15 @@ body:not(.talk) .p.other .nm{display:none}
 #faces button{flex:none;width:42px;height:42px;border-radius:50%;background:var(--dk2);padding:3px;transition:background .2s}
 #faces button svg{width:100%;height:100%;display:block}
 #faces button.on{background:var(--ye)}
-body.talk #faces{flex:0 1 140px}
-#say{flex:1;min-width:0;height:42px;border-radius:22px;border:0;padding:0 16px;background:var(--iv);color:var(--dk);font-size:14px;display:none}
-#sendBtn{height:42px;padding:0 16px;border-radius:22px;background:var(--ye);color:var(--dk);font-weight:900;display:none}
-body.talk #say,body.talk #sendBtn{display:block}
+#faces{flex:0 1 auto;max-width:46%}
+#say{flex:1;min-width:0;height:42px;border-radius:22px;border:0;padding:0 16px;background:var(--iv);color:var(--dk);font-size:14px}
+#sendBtn{flex:none;height:42px;padding:0 16px;border-radius:22px;background:var(--ye);color:var(--dk);font-weight:900}
+@media(max-width:560px){#faces{max-width:36%}#sendBtn{padding:0 13px}#say{padding:0 12px}}
+#keyHint{position:fixed;right:14px;bottom:76px;z-index:16;font-size:12px;color:#dfe9e3;background:rgba(15,45,36,.82);padding:6px 11px;border-radius:12px;pointer-events:none;transition:opacity 1s}
+#keyHint b{display:inline-block;min-width:20px;text-align:center;background:var(--iv);color:var(--dk);border-radius:5px;padding:0 4px;margin:0 1px;font-size:11px}
+@media(hover:none){#keyHint{display:none}}
+#log{max-height:40vh}
+#log div{pointer-events:none}
 @media(max-width:560px){#wardBtn span{display:none}}
 #log{position:fixed;left:12px;top:62px;z-index:15;display:flex;flex-direction:column;gap:4px;pointer-events:none;max-width:min(320px,70vw)}
 #log div{font-size:12px;background:rgba(15,45,36,.8);padding:4px 10px;border-radius:12px;color:#dfe9e3;animation:fadeLog 12s forwards}
@@ -177,7 +183,7 @@ body.talk #say,body.talk #sendBtn{display:block}
 #pmsg{font-size:14px;font-weight:900;text-align:center;margin-top:8px;min-height:20px;color:#1b7a4c}
 </style>
 </head>
-<body>
+<body class="talk">
 
 <div id="hud">
   <h1>라오스 골프 <span>라운지</span></h1>
@@ -185,7 +191,7 @@ body.talk #say,body.talk #sendBtn{display:block}
   <span class="chip" id="visits"></span>
   <span class="chip" id="roomChip"></span>
   <span class="sp"></span>
-  <button class="hbtn" id="talkBtn" title="다른 분들과 대화하기">💬</button>
+  <button class="hbtn on" id="talkBtn" title="다른 분들 채팅 보기/숨기기">💬</button>
   <button class="hbtn" id="soundBtn">🔇</button>
 </div>
 
@@ -206,13 +212,14 @@ body.talk #say,body.talk #sendBtn{display:block}
 </div></div>
 
 <div id="log"></div>
+<div id="keyHint">이동 <b>↑</b><b>↓</b><b>←</b><b>→</b> 또는 <b>W</b><b>A</b><b>S</b><b>D</b> · 채팅 <b>Enter</b></div>
 <div id="toast"></div>
 <button id="peek"></button>
 
 <div id="bar">
   <button id="wardBtn" title="내 공 꾸미기">🎨<span> 꾸미기</span></button>
   <div id="faces" aria-label="표정 바꾸기"></div>
-  <input id="say" maxlength="40" placeholder="한마디 (저장되지 않아요)" autocomplete="off">
+  <input id="say" maxlength="40" placeholder="채팅하기" autocomplete="off">
   <button id="sendBtn">보내기</button>
 </div>
 
@@ -414,8 +421,29 @@ function removeP(id){ const o=P.get(id); if(o){ o.el.remove(); P.delete(id);} }
 function bubble(id,text,big){ const o=P.get(id); if(!o) return; const b=o.el.querySelector('.bub'); b.textContent=text; b.classList.toggle('big',!!big); b.classList.add('on'); clearTimeout(o.bt); o.bt=setTimeout(()=>b.classList.remove('on'), big?3000:6500); }
 
 let last=performance.now();
+const KEYS=new Set(); let kbSent=0;
+const KMAP={ArrowUp:'u',ArrowDown:'d',ArrowLeft:'l',ArrowRight:'r',w:'u',s:'d',a:'l',d:'r',W:'u',S:'d',A:'l',D:'r','ㅈ':'u','ㄴ':'d','ㅁ':'l','ㅇ':'r'};
+function typing(){ const a=document.activeElement; return a && (a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT'); }
+function modalOpen(){ return !!document.querySelector('.modal.on'); }
+addEventListener('keydown',e=>{
+  if(modalOpen()) return;
+  if(e.key==='Escape'){ if(typing()) document.activeElement.blur(); else closeSheet(); return; }
+  if(typing()) return;
+  if(e.key==='Enter'){ e.preventDefault(); $('#say').focus(); return; }
+  const k=KMAP[e.key]; if(!k||!P.get(me.id)) return; e.preventDefault(); KEYS.add(k); hideTip();
+  const kh=$('#keyHint'); if(kh) kh.style.opacity='0';
+});
+addEventListener('keyup',e=>{ const k=KMAP[e.key]; if(k) KEYS.delete(k); });
+addEventListener('blur',()=>KEYS.clear());
+function kbStep(){
+  if(!KEYS.size||typing()) return; const o=P.get(me.id); if(!o) return;
+  const dx=(KEYS.has('r')?1:0)-(KEYS.has('l')?1:0), dy=(KEYS.has('d')?1:0)-(KEYS.has('u')?1:0); if(!dx&&!dy) return;
+  const n=Math.hypot(dx,dy); const [x,y]=clampPt(o.x+dx/n*36, o.y+dy/n*36); o.tx=x; o.ty=y;
+  const now=Date.now(); if(now-kbSent>140){ kbSent=now; T.send('mv',{id:me.id,tx:Math.round(x),ty:Math.round(y)}); }
+  if(me.st){ me.st=''; o.d.st=''; paint(o); T.send('st',{id:me.id,st:''}); }
+}
 function loop(t){
-  const dt=Math.min(.05,(t-last)/1000); last=t;
+  const dt=Math.min(.05,(t-last)/1000); last=t; kbStep();
   for(const [id,o] of P){
     const dx=o.tx-o.x, dy=o.ty-o.y, dist=Math.hypot(dx,dy);
     if(dist>1){ const s=Math.min(dist,SPEED*dt); o.x+=dx/dist*s; o.y+=dy/dist*s; o.el.classList.add('walk'); }
@@ -499,10 +527,10 @@ function stamp(z){ const s=document.querySelector(`.sign[data-zone="${z}"]`); if
 document.querySelectorAll('.sign').forEach(s=>s.addEventListener('pointerdown',ev=>{ ev.stopPropagation(); openSheet(s.dataset.zone); }));
 
 /* talk toggle (quiet by default) */
-$('#talkBtn').onclick=()=>{ const on=document.body.classList.toggle('talk'); $('#talkBtn').classList.toggle('on',on); toast(on?'대화 켜짐 · 다른 분들 이름과 말이 보여요':'조용히 모드 · 이모지만 보여요'); };
+$('#talkBtn').onclick=()=>{ const on=document.body.classList.toggle('talk'); $('#talkBtn').classList.toggle('on',on); toast(on?'💬 채팅 켜짐 · 다른 분들 말이 보여요':'🔕 조용히 모드 · 다른 분들 채팅을 숨겨요 (표정은 보여요)'); };
 let lastSay=0;
 function say(){ const inp=$('#say'); const t=clean(inp.value.slice(0,40)); if(!t) return; if(Date.now()-lastSay<1500) return; lastSay=Date.now(); inp.value=''; bubble(me.id,t); logLine(me.nick,t); T.send('say',{id:me.id,t}); }
-$('#sendBtn').onclick=say; $('#say').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing) say(); });
+$('#sendBtn').onclick=say; $('#say').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing){ if(!$('#say').value.trim()) $('#say').blur(); else say(); } });
 /* faces + look */
 let lookAt=0;
 function saveLook(){ store.set('laos_look',JSON.stringify({bc:me.bc,face:me.face,hat:me.hat,hc:me.hc})); }
